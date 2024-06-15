@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Categoria extends Model
+class Produto extends Model
 {
     use HasFactory;
 
@@ -25,16 +25,19 @@ class Categoria extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'categoria_id',
         'nome',
+        'descricao',
+        'preco',
     ];
 
     /**
-     * Get all of the produtos for the Categoria
+     * Get the categoria that owns the Produto
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function produtos(): HasMany
+    public function categoria(): BelongsTo
     {
-        return $this->hasMany(Produto::class);
+        return $this->belongsTo(Categoria::class);
     }
 }
