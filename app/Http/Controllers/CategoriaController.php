@@ -57,11 +57,26 @@ class CategoriaController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Atualize a categoria especificada.
      */
     public function update(Request $request, string $id)
     {
-        return 'update';
+        // Verifica se a categoria buscada de fato existe, e valida o dado recebido.
+        $validator = Validator::make($request->all() + ['categoria_id' => $id], [
+            'nome' => 'required|string',
+            'categoria_id' => 'exists:categorias,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        $validated = $validator->validated();
+
+        // Encontra a categoria e atualiza com os dados validados.
+        $categoria = Categoria::findOrFail($id)->update($validated);
+
+        return Categoria::select('nome')->findOrFail($id);
     }
 
     /**

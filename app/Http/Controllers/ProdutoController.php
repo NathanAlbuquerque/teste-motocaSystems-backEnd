@@ -62,11 +62,29 @@ class ProdutoController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Atualize o produto especificado.
      */
     public function update(Request $request, string $id)
     {
-        return 'update';
+        // Verifica se o produto buscado de fato existe, e valida os dados recebidos.
+        $validator = Validator::make($request->all() + ['produto_id' => $id], [
+            'nome' => 'nullable|string',
+            'descricao' => 'nullable|string',
+            'preco' => 'nullable|decimal:0,2',
+            'categoria_id' => 'nullable|integer|exists:categorias,id',
+            'produto_id' => 'exists:produtos,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        $validated = $validator->validated();
+
+        // Encontra o produto e atualiza com os dados validados.
+        $produto = Produto::findOrFail($id)->update($validated);
+
+        return Produto::select('nome', 'descricao', 'preco', 'categoria_id')->findOrFail($id);
     }
 
     /**
