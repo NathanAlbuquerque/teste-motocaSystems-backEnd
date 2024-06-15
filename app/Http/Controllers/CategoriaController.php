@@ -17,11 +17,25 @@ class CategoriaController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Cria uma nova categoria e armazena no banco de dados.
      */
     public function store(Request $request)
     {
-        return 'store';
+        // Validação dos dados recebidos.
+        $validator = Validator::make($request->all(), [
+            'nome' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        $validated = $validator->validated();
+
+        // Cria e armazena a nova categoria.
+        $categoria = Categoria::create($validated);
+
+        return Categoria::select('nome')->findOrFail($categoria->id);
     }
 
     /**
@@ -40,14 +54,6 @@ class CategoriaController extends Controller
 
         // Retorno dos detalhes da categoria específica.
         return Categoria::select('nome')->findOrFail($id);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        return 'edit';
     }
 
     /**

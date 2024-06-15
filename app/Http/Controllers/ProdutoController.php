@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Categoria;
 use App\Models\Produto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -17,11 +18,29 @@ class ProdutoController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Cria um novo produto e armazena no banco de dados.
      */
     public function store(Request $request)
     {
-        return 'store';
+        // Validação dos dados recebidos.
+        $validator = Validator::make($request->all(), [
+            'nome' => 'required|string',
+            'descricao' => 'required|string',
+            'preco' => 'required|decimal:0,2',
+            'categoria_id' => 'required|integer|exists:categorias,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        $validated = $validator->validated();
+
+        // Cria e armazena o novo produto atraves do relacionamento com a categoria.
+        $categoria = Categoria::findOrFail($validated['categoria_id']);
+        $produto = $categoria->produtos()->create($validated);
+
+        return Produto::select('nome', 'descricao', 'preco', 'categoria_id')->findOrFail($produto->id);
     }
 
     /**
@@ -40,14 +59,6 @@ class ProdutoController extends Controller
 
         // Retorno dos detalhes do produto específico.
         return Produto::select('nome', 'descricao', 'preco', 'categoria_id')->findOrFail($id);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        return 'edit';
     }
 
     /**
