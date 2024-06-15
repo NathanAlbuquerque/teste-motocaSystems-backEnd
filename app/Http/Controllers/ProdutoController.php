@@ -48,7 +48,7 @@ class ProdutoController extends Controller
      */
     public function show(string $id)
     {
-        // Verifica se a categoria buscada de fato existe.
+        // Verifica se o produto buscado de fato existe.
         $validator = Validator::make(['produto_id' => $id], [
             'produto_id' => 'exists:produtos,id',
         ]);
@@ -88,10 +88,22 @@ class ProdutoController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Deleta um produto específico.
      */
     public function destroy(string $id)
     {
-        return 'destroy';
+        // Verifica se o produto buscado de fato existe.
+        $validator = Validator::make(['produto_id' => $id], [
+            'produto_id' => 'exists:produtos,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 404);
+        }
+
+        // Encontra o produto e apaga.
+        Produto::findOrFail($id)->delete();
+
+        return response()->json('Produto foi excluído.', 200);
     }
 }

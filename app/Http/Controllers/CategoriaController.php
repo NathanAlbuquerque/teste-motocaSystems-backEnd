@@ -80,10 +80,23 @@ class CategoriaController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Deleta uma categoria específica.
      */
     public function destroy(string $id)
     {
-        return 'destroy';
+        // Verifica se a categoria buscada de fato existe.
+        $validator = Validator::make(['categoria_id' => $id], [
+            'categoria_id' => 'exists:categorias,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 404);
+        }
+
+        // Encontra a categoria e apaga tanto ela como seus produtos.
+        Categoria::findOrFail($id)->produtos()->delete();
+        Categoria::findOrFail($id)->delete();
+
+        return response()->json('Categoria e seus produtos foram excluídos.', 200);
     }
 }
