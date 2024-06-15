@@ -2,24 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Categoria;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class CategoriaController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Retorna uma lista de todas as categorias.
      */
     public function index()
     {
-        return 'index';
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return 'create';
+        return Categoria::select('nome')->get();
     }
 
     /**
@@ -31,11 +25,21 @@ class CategoriaController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Retorna os detalhes de uma categoria específica.
      */
     public function show(string $id)
     {
-        return 'show';
+        // Verifica se a categoria buscada de fato existe.
+        $validator = Validator::make(['categoria_id' => $id], [
+            'categoria_id' => 'exists:categorias,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 404);
+        }
+
+        // Retorno dos detalhes da categoria específica.
+        return Categoria::select('nome')->findOrFail($id);
     }
 
     /**

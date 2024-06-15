@@ -2,24 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Produto;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class ProdutoController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Retorna uma lista de todos os produtos.
      */
     public function index()
     {
-        return 'index';
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return 'create';
+        return Produto::select('nome', 'descricao', 'preco', 'categoria_id')->get();
     }
 
     /**
@@ -35,7 +29,17 @@ class ProdutoController extends Controller
      */
     public function show(string $id)
     {
-        return 'show';
+        // Verifica se a categoria buscada de fato existe.
+        $validator = Validator::make(['produto_id' => $id], [
+            'produto_id' => 'exists:produtos,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 404);
+        }
+
+        // Retorno dos detalhes do produto específico.
+        return Produto::select('nome', 'descricao', 'preco', 'categoria_id')->findOrFail($id);
     }
 
     /**

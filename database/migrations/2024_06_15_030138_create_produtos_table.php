@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('categoria_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
             $table->string('nome');
             $table->text('descricao');
-            $table->decimal('valor', 12, 2);
+            $table->decimal('preco', 12, 2);
             $table->timestamps();
         });
     }

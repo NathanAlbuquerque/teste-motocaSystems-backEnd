@@ -20,7 +20,7 @@ class ProdutoFactory extends Factory
             'categoria_id' => fake()->numberBetween(1, 9),
             'nome' => fake()->words(3, true),
             'descricao' => fake()->sentences(3, true),
-            'valor' => fake()->randomFloat(2, 50, 900),
+            'preco' => fake()->randomFloat(2, 50, 900),
         ];
     }
 }
